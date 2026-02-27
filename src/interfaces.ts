@@ -1,25 +1,25 @@
 // src/interfaces.ts
-export interface PerfilBase {
+
+export type PerfilBase = {
   id: string;
   nif: string;
   email: string;
   nome: string;
-}
+};
 
-export interface Cliente extends PerfilBase {
+export type Cliente = PerfilBase & {
   numCartao: string;
   telefone?: string;
   dataRegisto: string;
-}
+};
 
-export interface Loja extends PerfilBase {
+export type Loja = PerfilBase & {
   nomeLoja: string;
   percentualCB: number;
   ativo: boolean;
-  nif: string;
-}
+};
 
-export interface Movimento {
+export type Movimento = {
   id: string;
   tipo: 'ADICIONAR' | 'SUBTRAIR' | 'DESCONTAR';
   valorVenda: number;
@@ -30,4 +30,4 @@ export interface Movimento {
   dataHora: string;
   disponivelEm: string;
   status: 'PENDENTE' | 'DISPONIVEL';
-}
+};
