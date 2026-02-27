@@ -20,14 +20,6 @@ export interface Loja extends PerfilBase {
   nif: string;
 }
 
-export interface Operador {
-  id: string;
-  lojaId: string;
-  nome: string;
-  codigo: string;
-  ativo: boolean;
-}
-
 export interface Movimento {
   id: string;
   tipo: 'ADICIONAR' | 'SUBTRAIR' | 'DESCONTAR';
@@ -36,7 +28,6 @@ export interface Movimento {
   clienteId: string;
   lojaId: string;
   operadorCod: string;
-  documentoRef?: string;
   dataHora: string;
   disponivelEm: string;
   status: 'PENDENTE' | 'DISPONIVEL';

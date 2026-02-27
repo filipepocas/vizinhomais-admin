@@ -30,20 +30,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setLoading(true);
       if (currentUser) {
         setUser(currentUser);
-        // Admin: rochap.filipe@gmail.com
+        // Regra Admin
         if (currentUser.email === 'rochap.filipe@gmail.com') {
           setRole('admin');
         } else {
-          const lojaSnap = await getDoc(doc(db, 'lojas', currentUser.uid));
-          if (lojaSnap.exists()) {
-            setRole('comerciante');
-            setPerfil(lojaSnap.data() as Loja);
-          } else {
-            const clienteSnap = await getDoc(doc(db, 'clientes', currentUser.uid));
-            if (clienteSnap.exists()) {
-              setRole('cliente');
-              setPerfil(clienteSnap.data() as Cliente);
+          try {
+            // Verifica Loja
+            const lojaSnap = await getDoc(doc(db, 'lojas', currentUser.uid));
+            if (lojaSnap.exists()) {
+              setRole('comerciante');
+              setPerfil(lojaSnap.data() as Loja);
+            } else {
+              // Verifica Cliente
+              const cliSnap = await getDoc(doc(db, 'clientes', currentUser.uid));
+              if (cliSnap.exists()) {
+                setRole('cliente');
+                setPerfil(cliSnap.data() as Cliente);
+              }
             }
+          } catch (e) {
+            console.error("Erro ao procurar perfil:", e);
           }
         }
       } else {
