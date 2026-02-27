@@ -5,6 +5,7 @@ import { onAuthStateChanged, User } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { Cliente, Loja } from './types';
 
+// Definição do que o Contexto de Autenticação vai partilhar com a App
 interface AuthContextType {
   user: User | null;
   role: 'admin' | 'comerciante' | 'cliente' | null;
@@ -26,32 +27,40 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Monitor de estado do Firebase Auth
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setLoading(true);
       if (currentUser) {
         setUser(currentUser);
         
+        // REGRA DE OURO: Verificar se é o teu email de Admin
         if (currentUser.email === 'rochap.filipe@gmail.com') {
           setRole('admin');
+          setPerfil(null);
         } else {
-          // Busca na coleção de lojas
-          const lojaRef = doc(db, 'lojas', currentUser.uid);
-          const lojaSnap = await getDoc(lojaRef);
-          
-          if (lojaSnap.exists()) {
-            setRole('comerciante');
-            setPerfil(lojaSnap.data() as Loja);
-          } else {
-            // Busca na coleção de clientes
-            const clienteRef = doc(db, 'clientes', currentUser.uid);
-            const clienteSnap = await getDoc(clienteRef);
-            if (clienteSnap.exists()) {
-              setRole('cliente');
-              setPerfil(clienteSnap.data() as Cliente);
+          // Se não for admin, procura nas Lojas
+          try {
+            const lojaDoc = await getDoc(doc(db, 'lojas', currentUser.uid));
+            if (lojaDoc.exists()) {
+              setRole('comerciante');
+              setPerfil(lojaDoc.data() as Loja);
+            } else {
+              // Se não for loja, procura nos Clientes
+              const clienteDoc = await getDoc(doc(db, 'clientes', currentUser.uid));
+              if (clienteDoc.exists()) {
+                setRole('cliente');
+                setPerfil(clienteDoc.data() as Cliente);
+              } else {
+                setRole(null);
+                setPerfil(null);
+              }
             }
+          } catch (error) {
+            console.error("Erro ao procurar perfil:", error);
           }
         }
       } else {
+        // Se ninguém estiver logado, limpa tudo
         setUser(null);
         setRole(null);
         setPerfil(null);
@@ -69,4 +78,5 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
+// Hook para usar a autenticação em qualquer ecrã
 export const useAuth = () => useContext(AuthContext);
