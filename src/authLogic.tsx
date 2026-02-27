@@ -1,9 +1,9 @@
 // src/authLogic.tsx
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { auth, db } from './firebase';
-import { onAuthStateChanged, User } from 'firebase/auth';
+import { onAuthStateChanged, type User } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
-import { Cliente, Loja } from './interfaces';
+import type { Cliente, Loja } from './interfaces';
 
 interface AuthContextType {
   user: User | null;
@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               }
             }
           } catch (e) {
-            console.error("Erro de permissão ou dados:", e);
+            console.error("Erro ao carregar perfil:", e);
           }
         }
       } else {
