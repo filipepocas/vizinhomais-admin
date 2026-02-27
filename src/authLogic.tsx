@@ -1,5 +1,5 @@
 // src/authLogic.tsx
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { auth, db } from './firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
@@ -19,34 +19,35 @@ const AuthContext = createContext<AuthContextType>({
   loading: true 
 });
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [role, setRole] = useState<'admin' | 'comerciante' | 'cliente' | null>(null);
   const [perfil, setPerfil] = useState<Cliente | Loja | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Monitoriza se há alguém logado
-    return onAuthStateChanged(auth, async (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setLoading(true);
       if (currentUser) {
         setUser(currentUser);
         
-        // 1. Verificar se é o Admin (Teu Email)
         if (currentUser.email === 'rochap.filipe@gmail.com') {
           setRole('admin');
         } else {
-          // 2. Tentar encontrar na coleção de Lojas
-          const lojaDoc = await getDoc(doc(db, 'lojas', currentUser.uid));
-          if (lojaDoc.exists()) {
+          // Busca na coleção de lojas
+          const lojaRef = doc(db, 'lojas', currentUser.uid);
+          const lojaSnap = await getDoc(lojaRef);
+          
+          if (lojaSnap.exists()) {
             setRole('comerciante');
-            setPerfil(lojaDoc.data() as Loja);
+            setPerfil(lojaSnap.data() as Loja);
           } else {
-            // 3. Tentar encontrar na coleção de Clientes
-            const clienteDoc = await getDoc(doc(db, 'clientes', currentUser.uid));
-            if (clienteDoc.exists()) {
+            // Busca na coleção de clientes
+            const clienteRef = doc(db, 'clientes', currentUser.uid);
+            const clienteSnap = await getDoc(clienteRef);
+            if (clienteSnap.exists()) {
               setRole('cliente');
-              setPerfil(clienteDoc.data() as Cliente);
+              setPerfil(clienteSnap.data() as Cliente);
             }
           }
         }
@@ -57,6 +58,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       setLoading(false);
     });
+
+    return () => unsubscribe();
   }, []);
 
   return (
