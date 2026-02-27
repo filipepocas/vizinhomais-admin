@@ -17,6 +17,7 @@ export interface Loja extends PerfilBase {
   nomeLoja: string;
   percentualCB: number;
   ativo: boolean;
+  nif: string;
 }
 
 export interface Operador {
