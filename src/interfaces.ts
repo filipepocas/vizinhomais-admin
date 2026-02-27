@@ -1,5 +1,4 @@
-// src/types.ts
-
+// src/interfaces.ts
 export interface PerfilBase {
   id: string;
   nif: string;
