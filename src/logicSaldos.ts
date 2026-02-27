@@ -1,5 +1,5 @@
 // src/logicSaldos.ts
-import { Movimento } from './types';
+import { Movimento } from './interfaces';
 
 export const calcularSaldos = (movimentos: Movimento[]) => {
   const agora = new Date().getTime();
