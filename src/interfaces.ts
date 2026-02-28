@@ -7,7 +7,7 @@ export interface Loja {
   codigoPostal: string;
   cidade: string;
   telefone: string;
-  atividade: string;
+  atividade: string; // talho, café, etc. [cite: 53]
   percentualCB: number;
   ativo: boolean;
 }
@@ -20,17 +20,25 @@ export interface Cliente {
   codigoPostal: string;
   telefone: string;
   numCartao: string; // 10 dígitos [cite: 17]
+  ativo: boolean;
+}
+
+export interface Operador {
+  id: string;
+  nome: string;
+  codigo: string; // 5 dígitos [cite: 72]
+  lojaId: string;
 }
 
 export interface Movimento {
   id: string;
-  tipo: 'ADICIONAR' | 'SUBTRAIR' | 'DESCONTO';
+  tipo: 'ADICIONAR' | 'SUBTRAIR' | 'DESCONTO'; [cite: 62]
   valorVenda: number;
   valorCashback: number;
-  clienteId: string;
+  clienteId: string; // ID do Cliente
   lojaId: string;
   nomeLoja: string;
-  dataHora: string;
-  docOrigem?: string; // Fatura/Nota de crédito 
-  operadorCod?: string; // [cite: 72]
+  dataHora: string; // ISO String [cite: 9, 70]
+  docOrigem?: string; // Fatura/NC [cite: 8, 70]
+  operadorId?: string; // Quem fez o movimento [cite: 72]
 }
