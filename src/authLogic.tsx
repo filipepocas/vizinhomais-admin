@@ -6,6 +6,11 @@ import type { User } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import type { Cliente, Loja } from './interfaces';
 
+/**
+ * ESTE CONTEXTO GERENCIA QUEM ESTÁ LOGADO E QUAL O SEU PAPEL (ROLE)
+ * SEGUNDO O CHECKLIST: CLIENTE, COMERCIANTE OU ADMIN.
+ */
+
 interface AuthContextType {
   user: User | null;
   role: 'admin' | 'comerciante' | 'cliente' | null;
@@ -31,24 +36,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setLoading(true);
       if (currentUser) {
         setUser(currentUser);
-        // Regra do Administrador (Teu email) [cite: 13]
+        
+        // 1. VERIFICAÇÃO DE ADMINISTRADOR (EMAIL FIXO)
         if (currentUser.email === 'rochap.filipe@gmail.com') {
           setRole('admin');
-        } else {
-          // Tenta encontrar na coleção de lojas
-          const lojaDoc = await getDoc(doc(db, 'lojas', currentUser.uid));
-          if (lojaDoc.exists()) {
-            setRole('comerciante');
-            setPerfil(lojaDoc.data() as Loja);
-          } else {
-            // Tenta encontrar na coleção de clientes
-            const clienteDoc = await getDoc(doc(db, 'clientes', currentUser.uid));
-            if (clienteDoc.exists()) {
-              setRole('cliente');
-              setPerfil(clienteDoc.data() as Cliente);
-            }
-          }
+          setLoading(false);
+          return;
         }
+
+        // 2. VERIFICAÇÃO DE COMERCIANTE (PESQUISA NA COLECÇÃO 'lojas')
+        const lojaDoc = await getDoc(doc(db, 'lojas', currentUser.uid));
+        if (lojaDoc.exists()) {
+          setRole('comerciante');
+          setPerfil(lojaDoc.data() as Loja);
+          setLoading(false);
+          return;
+        }
+
+        // 3. VERIFICAÇÃO DE CLIENTE (PESQUISA NA COLECÇÃO 'clientes')
+        const clienteDoc = await getDoc(doc(db, 'clientes', currentUser.uid));
+        if (clienteDoc.exists()) {
+          setRole('cliente');
+          setPerfil(clienteDoc.data() as Cliente);
+          setLoading(false);
+          return;
+        }
+
+        // SE NÃO ENCONTRAR EM NENHUMA, FICA SEM ROLE (PODE SER REGISTO PENDENTE)
+        setRole(null);
       } else {
         setUser(null);
         setRole(null);
@@ -56,6 +71,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
       setLoading(false);
     });
+
     return () => unsubscribe();
   }, []);
 

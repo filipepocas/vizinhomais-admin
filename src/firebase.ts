@@ -1,9 +1,8 @@
-// src/firebase.ts
-import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
-// ESTES DADOS SÃO INDIVIDUAIS - COPIA DA TUA CONSOLA FIREBASE
+// SUBSTRITUI PELAS TUAS CREDENCIAIS DO FIREBASE CONSOLE
 const firebaseConfig = {
   apiKey: "AIzaSyBwZSP9g7kJb_djqx_1-tHdtgO3XLChm6E",
   authDomain: "vizinhomais.firebaseapp.com",
