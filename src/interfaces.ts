@@ -6,23 +6,21 @@ export interface Loja {
   nif: string;
   percentualCB: number;
   ativo: boolean;
-}
-
-export interface Cliente {
-  id: string;
-  nome: string;
-  email: string;
-  nif: string;
-  telefone: string;
+  morada?: string;
+  codigoPostal?: string;
+  cidade?: string;
+  telefone?: string;
+  atividade?: string;
 }
 
 export interface Movimento {
   id: string;
-  tipo: 'ADICIONAR' | 'SUBTRAIR';
+  tipo: 'ADICIONAR' | 'SUBTRAIR' | 'DESCONTO';
   valorVenda: number;
   valorCashback: number;
-  clienteId: string;
+  clienteId: string; // Email do cliente
   lojaId: string;
   nomeLoja: string;
   dataHora: string;
+  docOrigem?: string;
 }
