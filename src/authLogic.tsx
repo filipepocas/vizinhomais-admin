@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useContext } from 'react';
+import React, { useState, useEffect, createContext, useContext } from 'react';
 import type { ReactNode } from 'react';
 import { auth, db } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -13,7 +13,12 @@ interface AuthContextType {
   loading: boolean;
 }
 
-const AuthContext = createContext<AuthContextType>({ user: null, role: null, perfil: null, loading: true });
+const AuthContext = createContext<AuthContextType>({ 
+  user: null, 
+  role: null, 
+  perfil: null, 
+  loading: true 
+});
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -23,16 +28,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setLoading(true);
       if (currentUser) {
         setUser(currentUser);
+        // Regra do Administrador (Teu email) [cite: 13]
         if (currentUser.email === 'rochap.filipe@gmail.com') {
           setRole('admin');
         } else {
+          // Tenta encontrar na coleção de lojas
           const lojaDoc = await getDoc(doc(db, 'lojas', currentUser.uid));
           if (lojaDoc.exists()) {
             setRole('comerciante');
             setPerfil(lojaDoc.data() as Loja);
           } else {
+            // Tenta encontrar na coleção de clientes
             const clienteDoc = await getDoc(doc(db, 'clientes', currentUser.uid));
             if (clienteDoc.exists()) {
               setRole('cliente');
@@ -50,7 +59,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => unsubscribe();
   }, []);
 
-  return <AuthContext.Provider value={{ user, role, perfil, loading }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, role, perfil, loading }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 export const useAuth = () => useContext(AuthContext);

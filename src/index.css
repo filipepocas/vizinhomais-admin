@@ -8,3 +8,19 @@
     font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
   }
 }
+
+/* Estilo para inputs globais para manter o padrão do Checklist */
+input {
+  @apply outline-none transition-all duration-200;
+}
+
+/* Scrollbar personalizada para as listas de movimentos */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-200 rounded-full hover:bg-slate-300;
+}
