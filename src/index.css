@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Configurações base para garantir que o design segue o Checklist */
 @layer base {
   body {
     @apply bg-slate-50 text-slate-900 antialiased;
@@ -11,32 +10,16 @@
 }
 
 @layer components {
-  /* Estilo para os cartões de saldo (Pág 1 e 2 do Checklist) */
   .card-cliente {
     @apply bg-slate-950 text-white rounded-[3rem] shadow-2xl border-b-[12px] border-blue-600 p-10;
   }
-  
-  /* Estilo para os botões de ação rápida */
   .btn-primary {
     @apply bg-blue-600 text-white font-black uppercase tracking-widest py-4 px-6 rounded-2xl hover:bg-blue-700 transition-all active:scale-95 shadow-lg shadow-blue-200;
   }
-
   .btn-dark {
     @apply bg-slate-900 text-white font-black uppercase tracking-widest py-4 px-6 rounded-2xl hover:bg-black transition-all active:scale-95;
   }
-
-  /* Inputs estilizados para evitar erros de preenchimento */
   .input-v {
     @apply w-full p-4 bg-slate-100 rounded-xl border-2 border-transparent focus:border-blue-600 focus:bg-white outline-none transition-all font-bold;
   }
-}
-
-/* Animação para feedback visual de carregamento */
-.loading-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: .5; }
 }
