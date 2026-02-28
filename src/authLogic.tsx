@@ -1,7 +1,8 @@
-// src/authLogic.tsx
-import React, { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { useState, useEffect, createContext, useContext } from 'react';
+import type { ReactNode } from 'react';
 import { auth, db } from './firebase';
-import { onAuthStateChanged, type User } from 'firebase/auth';
+import { onAuthStateChanged } from 'firebase/auth';
+import type { User } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import type { Cliente, Loja } from './interfaces';
 
@@ -12,12 +13,7 @@ interface AuthContextType {
   loading: boolean;
 }
 
-const AuthContext = createContext<AuthContextType>({ 
-  user: null, 
-  role: null, 
-  perfil: null, 
-  loading: true 
-});
+const AuthContext = createContext<AuthContextType>({ user: null, role: null, perfil: null, loading: true });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -27,26 +23,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      setLoading(true);
       if (currentUser) {
         setUser(currentUser);
         if (currentUser.email === 'rochap.filipe@gmail.com') {
           setRole('admin');
         } else {
-          try {
-            const lojaSnap = await getDoc(doc(db, 'lojas', currentUser.uid));
-            if (lojaSnap.exists()) {
-              setRole('comerciante');
-              setPerfil(lojaSnap.data() as Loja);
-            } else {
-              const cliSnap = await getDoc(doc(db, 'clientes', currentUser.uid));
-              if (cliSnap.exists()) {
-                setRole('cliente');
-                setPerfil(cliSnap.data() as Cliente);
-              }
-            }
-          } catch (e) {
-            console.error("Erro ao carregar perfil:", e);
+          const lojaDoc = await getDoc(doc(db, 'lojas', currentUser.uid));
+          if (lojaDoc.exists()) {
+            setRole('comerciante');
+            setPerfil(lojaDoc.data() as Loja);
+          } else {
+            setRole('cliente');
           }
         }
       } else {
