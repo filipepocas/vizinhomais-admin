@@ -7,8 +7,8 @@ export interface Loja {
   codigoPostal: string;
   cidade: string;
   telefone: string;
-  atividade: string; // [cite: 53]
-  percentualCB: number; // [cite: 55]
+  atividade: string;
+  percentualCB: number;
   ativo: boolean;
 }
 
@@ -19,19 +19,26 @@ export interface Cliente {
   nif: string;
   codigoPostal: string;
   telefone: string;
-  numCartao: string; // [cite: 17]
+  numCartao: string;
   ativo: boolean;
+}
+
+export interface Operador {
+  id: string;
+  nome: string;
+  codigo: string; // 5 dígitos para validar operações
+  lojaId: string;
 }
 
 export interface Movimento {
   id: string;
-  tipo: 'ADICIONAR' | 'SUBTRAIR' | 'DESCONTO'; // [cite: 62, 63]
+  tipo: 'ADICIONAR' | 'SUBTRAIR' | 'DESCONTO';
   valorVenda: number;
   valorCashback: number;
-  clienteId: string; // Email ou ID do Cliente
+  clienteId: string;
   lojaId: string;
   nomeLoja: string;
-  dataHora: string; // [cite: 9, 70]
-  docOrigem?: string; // [cite: 8, 70]
-  operadorCod?: string; // [cite: 72]
+  dataHora: string;
+  docOrigem?: string;
+  operadorNome?: string;
 }

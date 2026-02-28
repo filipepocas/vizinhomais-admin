@@ -25,11 +25,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
-        // Regra Admin: Teu email configurado
         if (currentUser.email === 'rochap.filipe@gmail.com') {
           setRole('admin');
         } else {
-          // Verifica se é Comerciante ou Cliente no Firestore
           const lojaDoc = await getDoc(doc(db, 'lojas', currentUser.uid));
           if (lojaDoc.exists()) {
             setRole('comerciante');
