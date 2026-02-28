@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from './authLogic';
 import { auth, db } from './firebase';
 import { signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword } from 'firebase/auth';
@@ -17,7 +17,6 @@ const App = () => {
   const [formMov, setFormMov] = useState({ clienteEmail: '', valorVenda: 0, doc: '', pin: '' });
   const [formLoja, setFormLoja] = useState({ nome: '', email: '', nif: '', pc: 10 });
 
-  // Cálculo de Saldo 48h (Regra de Negócio)
   const saldos = useMemo(() => {
     const agora = new Date().getTime();
     const quarentaEOitoHorasMs = 48 * 60 * 60 * 1000;
@@ -99,7 +98,7 @@ const App = () => {
     window.location.reload();
   };
 
-  if (loading) return <div className="h-screen flex items-center justify-center font-bold">Carregando V+...</div>;
+  if (loading) return <div className="h-screen flex items-center justify-center font-bold">V+</div>;
 
   if (!user) {
     return (
@@ -108,7 +107,7 @@ const App = () => {
           <h1 className="text-4xl font-black mb-8 text-center italic text-blue-600">VIZINHO+</h1>
           <input type="email" placeholder="Email" className="input-v mb-4" onChange={e => setEmail(e.target.value)} required />
           <input type="password" placeholder="Password" className="input-v mb-6" onChange={e => setPassword(e.target.value)} required />
-          <button className="btn-primary w-full text-lg">Entrar no Painel</button>
+          <button className="btn-primary w-full text-lg">Entrar</button>
         </form>
       </div>
     );
@@ -117,28 +116,27 @@ const App = () => {
   return (
     <div className="min-h-screen bg-slate-50">
       <nav className="bg-white border-b p-6 flex justify-between items-center shadow-sm">
-        <span className="font-black text-2xl text-blue-600">V+ <span className="text-slate-400 text-sm font-normal">| {role?.toUpperCase()}</span></span>
-        <button onClick={() => signOut(auth)} className="text-slate-500 font-bold hover:text-red-600">Sair</button>
+        <span className="font-black text-2xl text-blue-600 italic">V+</span>
+        <button onClick={() => signOut(auth)} className="text-slate-500 font-bold">Sair</button>
       </nav>
 
       <main className="p-8 max-w-6xl mx-auto">
         {role === 'admin' && (
           <div className="grid md:grid-cols-2 gap-8">
             <div className="bg-white p-8 rounded-3xl border shadow-sm">
-              <h3 className="font-bold mb-6 text-slate-400 uppercase text-xs">Registar Nova Loja</h3>
+              <h3 className="font-bold mb-6 text-slate-400 uppercase text-xs">Registar Loja</h3>
               <form onSubmit={criarLojaAdmin} className="space-y-4">
-                <input type="text" placeholder="Nome da Loja" className="input-v" onChange={e => setFormLoja({...formLoja, nome: e.target.value})} />
-                <input type="email" placeholder="Email de Acesso" className="input-v" onChange={e => setFormLoja({...formLoja, email: e.target.value})} />
+                <input type="text" placeholder="Nome" className="input-v" onChange={e => setFormLoja({...formLoja, nome: e.target.value})} />
+                <input type="email" placeholder="Email" className="input-v" onChange={e => setFormLoja({...formLoja, email: e.target.value})} />
                 <input type="text" placeholder="NIF" className="input-v" onChange={e => setFormLoja({...formLoja, nif: e.target.value})} />
-                <button className="btn-dark w-full">Ativar Comerciante</button>
+                <button className="btn-primary w-full">Ativar</button>
               </form>
             </div>
             <div className="bg-white p-8 rounded-3xl border shadow-sm">
-              <h3 className="font-bold mb-6 text-slate-400 uppercase text-xs">Lojas Ativas</h3>
+              <h3 className="font-bold mb-6 text-slate-400 uppercase text-xs">Lojas</h3>
               {lojas.map(l => (
-                <div key={l.id} className="flex justify-between p-4 bg-slate-50 rounded-xl mb-2 border">
-                  <span className="font-bold">{l.nomeLoja}</span>
-                  <span className="text-blue-600 font-black">{l.percentualCB}% CB</span>
+                <div key={l.id} className="p-3 bg-slate-50 rounded-xl mb-2 flex justify-between font-bold">
+                  {l.nomeLoja} <span>{l.percentualCB}%</span>
                 </div>
               ))}
             </div>
@@ -148,42 +146,22 @@ const App = () => {
         {role === 'comerciante' && (
           <div className="grid md:grid-cols-2 gap-8">
             <div className="bg-white p-8 rounded-3xl border shadow-sm space-y-4">
-              <h3 className="font-bold text-slate-400 uppercase text-xs">Operação de Caixa</h3>
-              <input type="text" placeholder="Email ou Nº Cartão Cliente" className="input-v" onChange={e => setFormMov({...formMov, clienteEmail: e.target.value})} />
-              <input type="number" placeholder="Valor da Venda €" className="input-v" onChange={e => setFormMov({...formMov, valorVenda: Number(e.target.value)})} />
-              <input type="password" placeholder="PIN Operador (5 dígitos)" className="input-v" maxLength={5} onChange={e => setFormMov({...formMov, pin: e.target.value})} />
+              <input type="text" placeholder="Email Cliente" className="input-v" onChange={e => setFormMov({...formMov, clienteEmail: e.target.value})} />
+              <input type="number" placeholder="Valor €" className="input-v" onChange={e => setFormMov({...formMov, valorVenda: Number(e.target.value)})} />
+              <input type="password" placeholder="PIN" className="input-v" maxLength={5} onChange={e => setFormMov({...formMov, pin: e.target.value})} />
               <div className="grid grid-cols-2 gap-4">
-                <button onClick={() => handleMovimento('ADICIONAR')} className="btn-dark bg-green-600">Adicionar</button>
-                <button onClick={() => handleMovimento('DESCONTO')} className="btn-primary">Descontar</button>
+                <button onClick={() => handleMovimento('ADICIONAR')} className="bg-green-600 text-white p-4 rounded-xl font-bold">Adicionar</button>
+                <button onClick={() => handleMovimento('DESCONTO')} className="bg-blue-600 text-white p-4 rounded-xl font-bold">Descontar</button>
               </div>
-            </div>
-            <div className="bg-white p-8 rounded-3xl border shadow-sm">
-              <h3 className="font-bold text-slate-400 uppercase text-xs mb-4">Últimos Movimentos</h3>
-              {movimentos.map(m => (
-                <div key={m.id} className="p-4 border-b flex justify-between">
-                  <span>{m.clienteId}</span>
-                  <span className={m.tipo === 'ADICIONAR' ? 'text-green-600 font-bold' : 'text-red-600 font-bold'}>
-                    {m.tipo === 'ADICIONAR' ? '+' : '-'}{m.valorCashback.toFixed(2)}€
-                  </span>
-                </div>
-              ))}
             </div>
           </div>
         )}
 
         {role === 'cliente' && (
-          <div className="max-w-md mx-auto">
-            <div className="card-cliente text-center mb-8">
-              <div className="bg-white p-4 rounded-2xl inline-block mb-6 shadow-inner">
-                <QRCodeSVG value={user?.email || ""} size={140} />
-              </div>
-              <p className="text-blue-400 font-bold uppercase text-[10px] tracking-widest mb-1">Saldo Disponível (48h)</p>
-              <h2 className="text-6xl font-black italic mb-6">{saldos.disponivel.toFixed(2)}€</h2>
-              <div className="flex justify-between border-t border-white/10 pt-4">
-                <div className="text-left"><p className="text-[9px] text-slate-500">TOTAL</p><p className="font-bold text-lg">{saldos.total.toFixed(2)}€</p></div>
-                <div className="text-right"><p className="text-[9px] text-slate-500">LOJA</p><p className="font-bold text-lg">{(perfil as Cliente)?.nome || 'Vizinho+'}</p></div>
-              </div>
-            </div>
+          <div className="max-w-md mx-auto bg-slate-900 text-white p-8 rounded-[2rem] text-center shadow-2xl">
+            <div className="bg-white p-4 rounded-2xl inline-block mb-6"><QRCodeSVG value={user?.email || ""} size={140} /></div>
+            <p className="text-blue-400 font-bold uppercase text-[10px] tracking-widest mb-1">Saldo Disponível (48h)</p>
+            <h2 className="text-6xl font-black italic">{saldos.disponivel.toFixed(2)}€</h2>
           </div>
         )}
       </main>
