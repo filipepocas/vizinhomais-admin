@@ -2,8 +2,4 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-slate-50 text-slate-900 antialiased;
-  margin: 0;
-  font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
-}
+body { @apply bg-slate-50 text-slate-900; }

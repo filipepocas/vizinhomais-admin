@@ -1,16 +1,25 @@
 export interface Loja {
   id: string;
-  nome: string;
   nomeLoja: string;
   email: string;
   nif: string;
+  morada: string;
+  codigoPostal: string;
+  cidade: string;
+  telefone: string;
+  atividade: string;
   percentualCB: number;
   ativo: boolean;
-  morada?: string;
-  codigoPostal?: string;
-  cidade?: string;
-  telefone?: string;
-  atividade?: string;
+}
+
+export interface Cliente {
+  id: string;
+  nome: string;
+  email: string;
+  nif: string;
+  codigoPostal: string;
+  telefone: string;
+  numCartao: string; // 10 dígitos [cite: 17]
 }
 
 export interface Movimento {
@@ -18,9 +27,10 @@ export interface Movimento {
   tipo: 'ADICIONAR' | 'SUBTRAIR' | 'DESCONTO';
   valorVenda: number;
   valorCashback: number;
-  clienteId: string; // Email do cliente
+  clienteId: string;
   lojaId: string;
   nomeLoja: string;
   dataHora: string;
-  docOrigem?: string;
+  docOrigem?: string; // Fatura/Nota de crédito 
+  operadorCod?: string; // [cite: 72]
 }
